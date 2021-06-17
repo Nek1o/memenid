@@ -10,10 +10,12 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT 8000
+#include "config/server_args.h"
 
 int main(int argc, char **argv)
 {
+    struct Arguments args = get_server_args(argc, argv);
+
     int sock_fd = -1;
     if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -24,7 +26,7 @@ int main(int argc, char **argv)
     // preallocating the memory
     memset(&serv_addr, '0', sizeof(serv_addr));
 
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_port = htons(args.port);
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_family = AF_INET;
 
@@ -42,7 +44,7 @@ int main(int argc, char **argv)
     if (listen(sock_fd, 50) == -1)
     {
         char *err_buff;
-        sprintf(err_buff, "Could not listen on port %d", PORT);
+        sprintf(err_buff, "Could not listen on port %d", args.port);
         perror(err_buff);
         exit(EXIT_FAILURE);
     }
@@ -68,7 +70,6 @@ int main(int argc, char **argv)
         sleep(1);
     }
 
-    printf("Hello world!\n");
     close(sock_fd);
     exit(EXIT_SUCCESS);
 }
