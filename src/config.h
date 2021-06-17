@@ -3,6 +3,7 @@
 
 #define DEFAULT_PORT 8000
 #define DEFAULT_HOST 0
+#define CONNECTION_QUEUE 100
 
 #define DOC "A simple C gemini server"
 #define ARGS_DOC "TODO"
