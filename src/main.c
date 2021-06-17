@@ -23,20 +23,37 @@ int main(int argc, char **argv)
     int conn_fd = -1;
     while (1)
     {
-        char conn_buff[128] = "Hello, World!";
+        char conn_buff[MAX_URL_SIZE];
         if ((conn_fd = accept(sock_fd, (struct sockaddr *)NULL, NULL)) == -1)
         {
-            perror("An error ocured during opennin a new connection");
+            perror("An error occurred during openning a new connection");
             continue;
         }
+
+        int read_res = read(conn_fd, conn_buff, MAX_URL_SIZE);
+
+        printf("Successfully received a request %s", conn_buff);
+
+        switch (read_res)
+        {
+        case -1:
+            perror("An error occurred during reading from socket");
+            close(conn_fd);
+            break;
+        case 0:
+            conn_buff[read_res] = '\0';
+            printf("Successfully received a request %s", conn_buff);
+            break;
+        }
+
         if ((write(conn_fd, conn_buff, strlen(conn_buff))) == -1)
         {
-            perror("An error ocured when trying to write stuff to connection");
+            perror("An error occurred when trying to write stuff to connection");
             continue;
         }
 
         // printf("DATA: %s", conn_buff);
-
+        memset(conn_buff, 0, MAX_URL_SIZE);
         close(conn_fd);
         sleep(1);
     }
