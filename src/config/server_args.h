@@ -1,4 +1,5 @@
 #include <argp.h>
+#include <arpa/inet.h>
 
 #ifndef SERVER_ARGS_H
 #define SERVER_ARGS_H
@@ -6,7 +7,7 @@
 struct Arguments
 {
     int port;
-    char *host;
+    in_addr_t host;
 };
 
 // Argument parser func
