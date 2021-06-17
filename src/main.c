@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     memset(&serv_addr, '0', sizeof(serv_addr));
 
     serv_addr.sin_port = htons(args.port);
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_addr.s_addr = inet_addr(args.host);
     serv_addr.sin_family = AF_INET;
 
     // if (setsockopt(sockfd, AF_INET, ) == -1) {
