@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include <arpa/inet.h>
+
 #include "server_args.h"
 #include "config.h"
 
@@ -21,6 +23,9 @@ error_t parse_opt(int key, char *arg, struct argp_state *state)
             argp_usage(state);
         break;
     case 'h':
+        if (inet_addr(arg) == -1) {
+            argp_usage(state);
+        }
         arguments->host = arg;
         break;
     case ARGP_KEY_ARG:
