@@ -16,6 +16,9 @@
 
 int main(int argc, char **argv)
 {
+    // TODO signals handling for proper socket closing
+    // fuser -k <port>/tcp
+
     struct Arguments args = get_server_args(argc, argv);
 
     int sock_fd = configure_tcp_socket(args.host, args.port);
