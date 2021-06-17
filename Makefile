@@ -1,4 +1,5 @@
 CC = clang
+DEBUG = -g -O0
 
 TARGET_EXEC := out
 
@@ -11,11 +12,11 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 $(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(DEBUG) $(CFLAGS) -c $< -o $@
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@
+	$(CC) $(DEBUG) $(OBJS) -o $@
 
 .PHONY: clean
 clean:
