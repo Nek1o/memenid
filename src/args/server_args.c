@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 
 #include "server_args.h"
-#include "config.h"
+#include "../config.h"
 
 static char doc[] = DOC;
 static char args_doc[] = ARGS_DOC;
@@ -23,7 +23,8 @@ error_t parse_opt(int key, char *arg, struct argp_state *state)
             argp_usage(state);
         break;
     case 'h':
-        if ((arguments->host = inet_addr(arg)) == -1) {
+        if ((arguments->host = inet_addr(arg)) == -1)
+        {
             argp_usage(state);
         }
         break;
