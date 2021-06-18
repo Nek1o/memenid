@@ -25,11 +25,12 @@ int configure_tcp_socket(in_addr_t host, int port)
     serv_addr.sin_addr.s_addr = host;
     serv_addr.sin_family = AF_INET;
 
-    // TODO
-    // if (setsockopt(sockfd, AF_INET, ) == -1) {
-    //     perror("Socket options setting failed");
-    //     exit(EXIT_FAILURE);
-    // }
+    // for some reason they call it that
+    int yes = 1; 
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+        perror("Socket options setting failed");
+        exit(EXIT_FAILURE);
+    }
 
     if (bind(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
     {
