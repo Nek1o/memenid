@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     int conn_fd = -1;
     while (keep_running)
     {
-        char conn_buff[MAX_URL_SIZE];
+        char conn_buff[MAX_URL_SIZE] = "\0";
         if ((conn_fd = accept(sock_fd, (struct sockaddr *)NULL, NULL)) == -1)
         {
             perror("An error occurred during openning a new connection");
@@ -56,25 +56,26 @@ int main(int argc, char **argv)
         case -1:
             perror("An error occurred during reading from socket");
             close(conn_fd);
+            conn_buff[0] = '\0';
             break;
         case 0:
             conn_buff[read_res] = '\0';
             printf("Read returned 0");
             break;
         }
-        
-        int *conn_len;
-        *conn_len = strlen(conn_buff);
-        if ((send_all(conn_fd, conn_buff, conn_len)) == -1)
+
+        if (conn_buff[0] == '\0')
+            continue;
+
+        int conn_len = strlen(conn_buff);
+        if ((send_all(conn_fd, conn_buff, &conn_len)) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
             continue;
         }
 
-        // printf("DATA: %s", conn_buff);
         memset(conn_buff, 0, MAX_URL_SIZE);
         close(conn_fd);
-        sleep(1);
     }
 
     close(sock_fd);
