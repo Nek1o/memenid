@@ -21,15 +21,15 @@ static volatile sig_atomic_t keep_running = 1;
 
 // sigint_handler inverts the main while loop condition variable
 // and therefore stops the program
-void sigint_handler(int signum)
-{
-    write(1, "Graceful shutdown", 17);
-    keep_running = 0;
-}
+// void sigint_handler(int signum)
+// {
+//     write(1, "Graceful shutdown", 17);
+//     keep_running = 0;
+// }
 
 int main(int argc, char **argv)
 {
-    signal(SIGINT, sigint_handler);
+    // signal(SIGINT, sigint_handler);
     // TODO signals handling for proper socket closing
     // fuser -k <port>/tcp
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
             perror("An error occurred when trying to write stuff to connection");
             continue;
         }
-        
+
         // printf("DATA: %s", conn_buff);
         memset(conn_buff, 0, MAX_URL_SIZE);
         close(conn_fd);
