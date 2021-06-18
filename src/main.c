@@ -31,7 +31,9 @@ int main(int argc, char **argv)
 {
     // signal(SIGINT, sigint_handler);
     // TODO signals handling for proper socket closing
-    // fuser -k <port>/tcp
+
+    // TODO
+    // https://wiki.openssl.org/index.php/Simple_TLS_Server
 
     struct Arguments args = get_server_args(argc, argv);
 
@@ -49,7 +51,8 @@ int main(int argc, char **argv)
 
         int read_res = recv(conn_fd, conn_buff, MAX_URL_SIZE, 0);
 
-        if (read_res == -1) {
+        if (read_res == -1)
+        {
             perror("An error occurred during reading from socket");
             close(conn_fd);
             continue;
