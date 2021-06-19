@@ -30,7 +30,6 @@ static volatile sig_atomic_t keep_running = 1;
 int main(int argc, char **argv)
 {
     // signal(SIGINT, sigint_handler);
-    // TODO signals handling for proper socket closing
 
     // TODO
     // https://wiki.openssl.org/index.php/Simple_TLS_Server
