@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
     struct Arguments args = get_server_args(argc, argv);
 
-    int sock_fd = configure_tcp_socket(args.host, args.port);
+    int sock_fd = create_tcp_socket(args.host, args.port);
 
     int conn_fd = -1;
     while (keep_running)

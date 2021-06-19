@@ -8,7 +8,7 @@
 
 // configure_tcp_socket creates a tcp socket socket according to config and cli args.
 // Socket is bound and listening ready to accept connections.
-int configure_tcp_socket(in_addr_t host, int port)
+int create_tcp_socket(in_addr_t host, int port)
 {
     int sock_fd = -1;
     if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -26,8 +26,9 @@ int configure_tcp_socket(in_addr_t host, int port)
     serv_addr.sin_family = AF_INET;
 
     // for some reason they call it that
-    int yes = 1; 
-    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+    int yes = 1;
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+    {
         perror("Socket options setting failed");
         exit(EXIT_FAILURE);
     }
@@ -54,7 +55,7 @@ int configure_tcp_socket(in_addr_t host, int port)
 // send_all sends all the data from buff via socket fd,
 // len initially is a length of buff aka the number of bytes to be sent
 // then len is set to the number of bytes actually sent.
-int send_all(int fd, char *buff, int *len)
+int send_all(int fd, const char *buff, int *len)
 {
     int total = 0; // bytes send
     int bytes_left = *len;
