@@ -49,9 +49,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        int read_res = recv(conn_fd, conn_buff, MAX_URL_SIZE, 0);
-
-        if (read_res == -1)
+        if ((recv(conn_fd, conn_buff, MAX_URL_SIZE, 0)) == -1)
         {
             perror("An error occurred during reading from socket");
             close(conn_fd);
