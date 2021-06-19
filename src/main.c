@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -15,6 +16,7 @@
 #include "args/server_args.h"
 #include "network/socket.h"
 #include "signals/signals.h"
+#include "gemini_protocol/utils.h"
 
 // main while loop condition variable
 static volatile sig_atomic_t keep_running = 1;
@@ -33,6 +35,8 @@ int main(int argc, char **argv)
 
     // TODO
     // https://wiki.openssl.org/index.php/Simple_TLS_Server
+
+    // parse_request_url("gemini://xxx.xx/yy/zz");
 
     struct Arguments args = get_server_args(argc, argv);
 
