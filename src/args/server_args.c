@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
+
+#include <sys/stat.h>
 
 #include <arpa/inet.h>
 
@@ -15,6 +18,8 @@ static char args_doc[] = ARGS_DOC;
 error_t parse_opt(int key, char *arg, struct argp_state *state)
 {
     struct Arguments *arguments = state->input;
+    // for dir checking
+    struct stat stats;
     switch (key)
     {
     case 'p':
@@ -27,6 +32,14 @@ error_t parse_opt(int key, char *arg, struct argp_state *state)
         {
             argp_usage(state);
         }
+        break;
+    case 'r':
+        stat(arg, &stats);
+        // check if that dir exists
+        if (!S_ISDIR(stats.st_mode))
+            argp_usage(state);
+
+        arguments->root = arg;
         break;
     case ARGP_KEY_ARG:
         return 0;
@@ -45,12 +58,13 @@ struct Arguments get_server_args(int argc, char **argv)
     struct argp_option options[] = {
         {"port", 'p', "PORT", 0, "Server port"},
         {"host", 'h', "HOST", 0, "Server host"},
+        {"root", 'r', "ROOT", 0, "Root for static files"},
         {0}};
 
     struct argp argp = {options, parse_opt, args_doc, doc};
 
     // setting default arguments
-    struct Arguments args = {DEFAULT_PORT, DEFAULT_HOST};
+    struct Arguments args = {DEFAULT_PORT, DEFAULT_HOST, DEFAULT_ROOT};
 
     // getting arguments if any and all the argp magic
     argp_parse(&argp, argc, argv, 0, 0, &args);

@@ -3,6 +3,8 @@
 
 #define DEFAULT_PORT 8000
 #define DEFAULT_HOST 0
+#define DEFAULT_ROOT "." 
+
 #define CONNECTION_QUEUE 100
 
 #define MAX_URL_SIZE 1024

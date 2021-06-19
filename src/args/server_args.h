@@ -8,6 +8,7 @@ struct Arguments
 {
     int port;
     in_addr_t host;
+    char *root;
 };
 
 // Argument parser func
