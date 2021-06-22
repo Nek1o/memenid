@@ -16,7 +16,8 @@
 #include "args/server_args.h"
 #include "network/socket.h"
 #include "signals/signals.h"
-#include "gemini_protocol/utils.h"
+#include "gemini_protocol/gemini_utils.h"
+#include "server/server_utils.h"
 
 // main while loop condition variable
 static volatile sig_atomic_t keep_running = 1;
@@ -61,13 +62,12 @@ int main(int argc, char **argv)
 
         printf("Successfully received a request %s", conn_buff);
 
-        int conn_len = strlen(conn_buff);
-        if ((send_all(conn_fd, conn_buff, &conn_len)) == -1)
-        {
-            perror("An error occurred when trying to write stuff to connection");
-            continue;
-        }
+        struct Response response;
+        construct_response(conn_buff, args.root, &response);
 
+        send_response(response, conn_fd);
+
+        Response_free(&response);
         memset(conn_buff, 0, MAX_URL_SIZE);
         close(conn_fd);
     }
