@@ -9,6 +9,6 @@ int create_tcp_socket(in_addr_t, int);
 
 // send_all sends all the data from buff via socket fd
 // len is set to the number of bytes sent
-int send_all(int, const char *, int *);
+int send_all(int fd, const char *buff, int *len);
 
 #endif // !SOCKET_H
