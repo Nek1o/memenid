@@ -36,6 +36,21 @@ static int find_n(const char *str, char symbol, int n)
     return -1;
 }
 
+// strips \r and \n from the string
+// -1 on error, 0 on success
+static int stripr(char *str)
+{
+    for (size_t i = strlen(str) - 1; i > 0; i--)
+    {
+        if (str[i] == '\n' || str[i] == '\r')
+            str[i] = '\0';
+        else
+            break;
+    }
+
+    return 0;
+}
+
 // check_protocol returns false if protocol isn't gemini
 bool check_gemini_protocol(const Url url)
 {
@@ -64,7 +79,7 @@ Path parse_request_url(const Url url)
     int path_size = strlen(url) - third_slash_index + 1;
     char *path = (char *)malloc(path_size);
     strncpy(path, url + third_slash_index, path_size);
-
+    stripr(path);
     return path;
 }
 
@@ -97,10 +112,9 @@ int get_file_content(struct Resource *resource)
     FILE *file = NULL;
     if ((file = fopen(resource->path, "rb")) == NULL)
     {
-        MetaString buff;
-        strcpy(buff, "An error occurred during openning a file for serving ");
-        strcat(buff, resource->path);
-        perror(buff);
+        // perror alternative
+        fprintf(stderr, "An error occurred during openning a file for serving %s\n: %d %s\n",
+                resource->path, errno, strerror(errno));
         return 1;
     }
 
