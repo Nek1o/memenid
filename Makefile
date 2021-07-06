@@ -1,5 +1,5 @@
 CC = clang
-DEBUG = -g -O0
+DEBUG = -g -O0 -lssl -lcrypto
 
 TARGET_EXEC := out
 
