@@ -60,7 +60,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        printf("Successfully received a request %s", conn_buff);
+        printf("Successfully received a request %s\n", conn_buff);
 
         struct Response response;
         Response_new(&response);
