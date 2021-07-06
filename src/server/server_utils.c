@@ -101,9 +101,9 @@ int get_file_content(struct Resource *resource)
         return 1;
     }
 
-    fseek(file, 0, SEEK_END);  // jump to the end of the file
+    fseek(file, 0, SEEK_END);   // jump to the end of the file
     int file_len = ftell(file); // get the current byte offset in the file
-    rewind(file);              // jump back to the beginning of the file
+    rewind(file);               // jump back to the beginning of the file
 
     resource->content = (char *)malloc(file_len * sizeof(char)); // enough memory for the file
     if (fread(resource->content, file_len, 1, file) != 1)        // read in the entire file
@@ -214,6 +214,13 @@ int send_response(const struct Response response, int socket_fd)
         // TODO validate send_all len
 
         // TODO send response body
+        *len = strlen(response.resource.content);
+        if ((send_all(socket_fd, response.resource.content, len)) == -1)
+        {
+            perror("An error occurred when trying to write stuff to connection");
+            return -1;
+        }
+        // TODO validate send_all len
 
         return 0;
     }
@@ -223,6 +230,22 @@ int send_response(const struct Response response, int socket_fd)
         if (response.status == BAD_REQUEST)
         {
             if (sprintf(header, "%d %s\r\n", BAD_REQUEST, response.meta) < 0)
+            {
+                // failed to construct a header string
+                // don't know yet what to do in this case
+                return -1;
+            }
+            *len = strlen(header);
+            if ((send_all(socket_fd, header, len)) == -1)
+            {
+                perror("An error occurred when trying to write stuff to connection");
+                return -1;
+            }
+        }
+
+        if (response.status == NOT_FOUND)
+        {
+            if (sprintf(header, "%d %s\r\n", NOT_FOUND, response.meta) < 0)
             {
                 // failed to construct a header string
                 // don't know yet what to do in this case
