@@ -64,6 +64,19 @@ Path parse_request_url(const Url url)
     return path;
 }
 
+void Resource_new(struct Resource *r)
+{
+    r->path = NULL;
+    r->content = NULL;
+    r->len = 0;
+}
+
+void Response_new(struct Response *r)
+{
+    Resource_new(&r->resource);
+    strcpy(r->meta, "");
+}
+
 void Resource_free(struct Resource *r)
 {
     free(r->content);
@@ -73,7 +86,6 @@ void Resource_free(struct Resource *r)
 void Response_free(struct Response *r)
 {
     Resource_free(&r->resource);
-    free(r->meta);
 }
 
 int get_file_content(struct Resource *resource)
@@ -148,7 +160,7 @@ int construct_response(const char *data, const Path root_dir, struct Response *r
     {
         // no response body, meta for additional info
         response->status = BAD_REQUEST;
-        response->meta = "Bad protocol, should be `gemini`";
+        strcpy(response->meta, "Bad protocol, should be `gemini`");
         return 0;
     }
 
@@ -159,13 +171,13 @@ int construct_response(const char *data, const Path root_dir, struct Response *r
     {
         // no response body, meta for additional info
         response->status = NOT_FOUND;
-        response->meta = "Resource not found";
+        strcpy(response->meta, "Resource not found");
         return 0;
     }
 
     response->status = SUCCESS;
     // TODO deduce file MIME type from the file extension
-    response->meta = "text/gemini; lang=en\r\n";
+    strcpy(response->meta, "text/gemini; lang=en\r\n");
 
     return 0;
 }
