@@ -66,7 +66,17 @@ int main(int argc, char **argv)
         SSL *ssl;
         ssl = SSL_new(ctx);
         SSL_set_fd(ssl, conn_fd);
+        if (SSL_accept(ssl) <= 0)
+        {
+            ERR_print_errors_fp(stderr);
+            memset(conn_buff, 0, MAX_URL_SIZE);
 
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+
+            close(conn_fd);
+            continue;
+        }
         if ((recv(conn_fd, conn_buff, MAX_URL_SIZE, 0)) == -1)
         {
             perror("An error occurred during reading from socket");
