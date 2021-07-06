@@ -97,7 +97,10 @@ int get_file_content(struct Resource *resource)
     FILE *file = NULL;
     if ((file = fopen(resource->path, "rb")) == NULL)
     {
-        perror("An error occurred during openning a file for serving");
+        MetaString buff;
+        strcpy(buff, "An error occurred during openning a file for serving ");
+        strcat(buff, resource->path);
+        perror(buff);
         return 1;
     }
 
