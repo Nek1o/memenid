@@ -55,7 +55,11 @@ Path parse_request_url(const Url url)
     int third_slash_index = find_n(url, '/', 3);
 
     if (third_slash_index == -1)
-        return "/";
+    {
+        char *path = (char *)malloc(2);
+        strcpy(path, "/");
+        return path;
+    }
 
     int path_size = strlen(url) - third_slash_index + 1;
     char *path = (char *)malloc(path_size);
@@ -91,18 +95,18 @@ void Response_free(struct Response *r)
 int get_file_content(struct Resource *resource)
 {
     FILE *file = NULL;
-    if ((fopen(resource->path, "rb")) == NULL)
+    if ((file = fopen(resource->path, "rb")) == NULL)
     {
         perror("An error occurred during openning a file for serving");
         return 1;
     }
 
     fseek(file, 0, SEEK_END);  // jump to the end of the file
-    int filelen = ftell(file); // get the current byte offset in the file
+    int file_len = ftell(file); // get the current byte offset in the file
     rewind(file);              // jump back to the beginning of the file
 
-    resource->content = (char *)malloc(filelen * sizeof(char)); // enough memory for the file
-    if (fread(resource->content, filelen, 1, file) != 1)        // read in the entire file
+    resource->content = (char *)malloc(file_len * sizeof(char)); // enough memory for the file
+    if (fread(resource->content, file_len, 1, file) != 1)        // read in the entire file
     {
         perror("An error occurred during reading a file for serving");
         return 1;
@@ -125,15 +129,14 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
     // strcpy(constructed_path, root_dir);
     // constructed_path = strcat(constructed_path, resource->path);
 
-    Path constructed_path;
-    sprintf(constructed_path, "%s%s", root_dir, resource->path);
-
     // root of the capsule
     if (strcmp(resource->path, "/") == 0)
     {
         // trying index.gmi
         // constructed_path = strcat(constructed_path, "index.gmi");
         // resource->path = constructed_path;
+
+        resource->path = (Path)realloc(resource->path, (strlen(root_dir) + 11) * sizeof(char));
         sprintf(resource->path, "%s/%s", root_dir, "index.gmi");
         if (get_file_content(resource) == 0)
             return 0;
@@ -141,11 +144,14 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
         // trying index.gemini
         // constructed_path = strcat(constructed_path, "index.gemini");
         // resource->path = constructed_path;
+        resource->path = (Path)realloc(resource->path, (strlen(root_dir) + 14) * sizeof(char));
         sprintf(resource->path, "%s/%s", root_dir, "index.gemini");
         if (get_file_content(resource) == 0)
             return 0;
     }
 
+    Path constructed_path = (Path)malloc((strlen(root_dir) + strlen(resource->path)) * sizeof(Path));
+    sprintf(constructed_path, "%s%s", root_dir, resource->path);
     // return whatever the user requested from the root directory
     resource->path = constructed_path;
     if (get_file_content(resource) != 0)
@@ -187,11 +193,11 @@ int send_response(const struct Response response, int socket_fd)
     // for the send_all func
     int *len = (int *)malloc(sizeof(int));
 
+    char header[2048];
     // send success response header
     // <STATUS><SPACE><META><CR><LF>
     if (response.status == SUCCESS)
     {
-        char header[128];
         if (sprintf(header, "%d %s\r\n", SUCCESS, response.meta) < 0)
         {
             // failed to construct a header string
@@ -205,6 +211,8 @@ int send_response(const struct Response response, int socket_fd)
             return -1;
         }
 
+        // TODO validate send_all len
+
         // TODO send response body
 
         return 0;
@@ -214,7 +222,6 @@ int send_response(const struct Response response, int socket_fd)
         // TODO make send_header func
         if (response.status == BAD_REQUEST)
         {
-            char header[128];
             if (sprintf(header, "%d %s\r\n", BAD_REQUEST, response.meta) < 0)
             {
                 // failed to construct a header string
