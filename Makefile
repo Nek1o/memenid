@@ -1,5 +1,6 @@
 CC = clang
-DEBUG = -g -O0 -lssl -lcrypto
+DEBUG = -g -O0 
+LD = -lssl -lcrypto
 
 TARGET_EXEC := out
 
@@ -16,7 +17,7 @@ $(BUILD_DIR)/%.c.o: %.c
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CC) $(DEBUG) $(OBJS) -o $@
+	$(CC) $(DEBUG) $(LD) $(OBJS) -o $@
 
 .PHONY: clean
 clean:
