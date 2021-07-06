@@ -42,7 +42,6 @@ int main(int argc, char **argv)
 
     struct Arguments args = get_server_args(argc, argv);
 
-    int sock_fd;
     SSL_CTX *ctx;
 
     int conn_fd = -1;
@@ -52,13 +51,10 @@ int main(int argc, char **argv)
 
     configure_context(ctx);
 
-    sock_fd = create_tcp_socket(args.host, args.port);
+    int sock_fd = create_tcp_socket(args.host, args.port);
 
     while (keep_running)
-    {   
-        SSL *ssl;
-        ssl = SSL_new(ctx);
-        SSL_set_fd(ssl, conn_fd);
+    {
 
         char conn_buff[MAX_URL_SIZE];
         if ((conn_fd = accept(sock_fd, (struct sockaddr *)NULL, NULL)) == -1)
@@ -66,6 +62,10 @@ int main(int argc, char **argv)
             perror("An error occurred during openning a new connection");
             continue;
         }
+
+        SSL *ssl;
+        ssl = SSL_new(ctx);
+        SSL_set_fd(ssl, conn_fd);
 
         if ((recv(conn_fd, conn_buff, MAX_URL_SIZE, 0)) == -1)
         {
@@ -92,5 +92,7 @@ int main(int argc, char **argv)
     }
 
     close(sock_fd);
+    SSL_CTX_free(ctx);
+    cleanup_openssl();
     exit(EXIT_SUCCESS);
 }
