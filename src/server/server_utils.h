@@ -55,7 +55,7 @@ bool check_gemini_protocol(const Url);
 
 // get_file_content reads an entire file located at path into a buffer
 // on success returns 0
-// on any error returns -1
+// on any error returns 1
 int get_file_content(struct Resource *);
 
 // get_resource_for_serving constructs resource that should be served to the user

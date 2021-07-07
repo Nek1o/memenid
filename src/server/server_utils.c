@@ -61,11 +61,7 @@ bool check_gemini_protocol(const Url url)
     return strncmp(url, "gemini", semicolon_index - 1) == 0 ? true : false;
 }
 
-// parse_request_url returns path to the requested resource
-// e.g. gemini://xxx.xx/yy/zz => /yy/zz
-// returns "/" if no path was presented
-// !!! need cleanup !!!
-
+// find_two_leading_symbols checks if there are two identical symbols next to each other in a str
 bool find_two_leading_symbols(char *str, char symbol)
 {
     for (size_t i = 0; i < strlen(str) - 1; i++)
@@ -74,6 +70,10 @@ bool find_two_leading_symbols(char *str, char symbol)
     return false;
 }
 
+// parse_request_url returns path to the requested resource
+// e.g. gemini://xxx.xx/yy/zz => /yy/zz
+// returns "/" if no path was presented
+// !!! need cleanup !!!
 Path parse_request_url(const Url url)
 {
     int third_slash_index = find_n(url, '/', 3);
@@ -153,9 +153,7 @@ int get_file_content(struct Resource *resource)
 int get_resource_for_serving(const Path root_dir, struct Resource *resource)
 {
     // this implementation treats absent file errors and file read errors the same way
-    // returning 1 upon such case
-
-    // TODO check for dots `..` in path
+    // returning 1 upon each case
 
     // concatenate root_dir path with requested resource path in constructed_path
     // Path constructed_path = (Path)malloc(strlen(root_dir) * sizeof(char));
