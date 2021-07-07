@@ -186,6 +186,7 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
     Path constructed_path = (Path)malloc((strlen(root_dir) + strlen(resource->path)) * sizeof(Path));
     sprintf(constructed_path, "%s%s", root_dir, resource->path);
     // return whatever the user requested from the root directory
+    // TODO: Find a way to avoid ".." in this check!
     resource->path = constructed_path;
     if (get_file_content(resource) != 0)
         return 1;
