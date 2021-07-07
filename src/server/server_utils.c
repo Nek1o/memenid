@@ -220,12 +220,14 @@ int send_response(SSL *ssl, const struct Response response, int socket_fd)
         {
             // failed to construct a header string
             // don't know yet what to do in this case
+            free(len);
             return -1;
         }
         *len = strlen(header);
         if ((SSL_write(ssl, header, *len)) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
+            free(len);
             return -1;
         }
 
@@ -236,10 +238,11 @@ int send_response(SSL *ssl, const struct Response response, int socket_fd)
         if ((SSL_write(ssl, response.resource.content, *len)) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
+            free(len);
             return -1;
         }
         // TODO validate send_all len
-
+        free(len);
         return 0;
     }
     if (response.status / 10 == 5)
@@ -251,6 +254,7 @@ int send_response(SSL *ssl, const struct Response response, int socket_fd)
             {
                 // failed to construct a header string
                 // don't know yet what to do in this case
+                free(len);
                 return -1;
             }
             *len = strlen(header);
@@ -258,6 +262,7 @@ int send_response(SSL *ssl, const struct Response response, int socket_fd)
             {
                 perror("An error occurred when trying to write stuff to connection");
                 return -1;
+                free(len);
             }
         }
 
@@ -267,11 +272,13 @@ int send_response(SSL *ssl, const struct Response response, int socket_fd)
             {
                 // failed to construct a header string
                 // don't know yet what to do in this case
+                free(len);
                 return -1;
             }
             *len = strlen(header);
             if ((SSL_write(ssl, header, *len)) == -1)
             {
+                free(len);
                 perror("An error occurred when trying to write stuff to connection");
                 return -1;
             }
