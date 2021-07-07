@@ -15,6 +15,7 @@
 #include "config.h"
 #include "args/server_args.h"
 #include "network/socket.h"
+#include "network/open_ssl.h"
 #include "signals/signals.h"
 #include "gemini_protocol/gemini_utils.h"
 #include "server/server_utils.h"
@@ -41,11 +42,20 @@ int main(int argc, char **argv)
 
     struct Arguments args = get_server_args(argc, argv);
 
-    int sock_fd = create_tcp_socket(args.host, args.port);
+    SSL_CTX *ctx;
 
     int conn_fd = -1;
+
+    init_openssl();
+    ctx = create_context();
+
+    configure_context(ctx);
+
+    int sock_fd = create_tcp_socket(args.host, args.port);
+
     while (keep_running)
     {
+
         char conn_buff[MAX_URL_SIZE];
         if ((conn_fd = accept(sock_fd, (struct sockaddr *)NULL, NULL)) == -1)
         {
@@ -53,6 +63,20 @@ int main(int argc, char **argv)
             continue;
         }
 
+        SSL *ssl;
+        ssl = SSL_new(ctx);
+        SSL_set_fd(ssl, conn_fd);
+        if (SSL_accept(ssl) <= 0)
+        {
+            ERR_print_errors_fp(stderr);
+            memset(conn_buff, 0, MAX_URL_SIZE);
+
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+
+            close(conn_fd);
+            continue;
+        }
         if ((recv(conn_fd, conn_buff, MAX_URL_SIZE, 0)) == -1)
         {
             perror("An error occurred during reading from socket");
@@ -66,13 +90,19 @@ int main(int argc, char **argv)
         Response_new(&response);
         construct_response(conn_buff, args.root, &response);
 
-        send_response(response, conn_fd);
+        send_response(ssl, response, conn_fd);
 
         Response_free(&response);
         memset(conn_buff, 0, MAX_URL_SIZE);
+
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+
         close(conn_fd);
     }
 
     close(sock_fd);
+    SSL_CTX_free(ctx);
+    cleanup_openssl();
     exit(EXIT_SUCCESS);
 }

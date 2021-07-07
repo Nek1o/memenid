@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "../gemini_protocol/gemini_utils.h"
+#include "../network/open_ssl.h"
 
 #define PATH_SEPARATOR "/"
 
@@ -64,6 +65,6 @@ int get_resource_for_serving(const Path, struct Resource *);
 // returns 1 upon any error
 int construct_response(const char *data, const Path root_dir, struct Response *response);
 
-int send_response(const struct Response, int socket_fd);
+int send_response(SSL *ssl, const struct Response, int socket_fd);
 
 #endif // !SERVER_UTILS_H

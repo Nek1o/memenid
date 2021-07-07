@@ -5,6 +5,7 @@
 
 #include "server_utils.h"
 #include "../network/socket.h"
+#include "../network/open_ssl.h"
 #include "../gemini_protocol/gemini_utils.h"
 
 // -1 on not found
@@ -179,14 +180,14 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
 
 int construct_response(const char *data, const Path root_dir, struct Response *response)
 {
-    if (!check_gemini_protocol((Url)data))
+    /*if (!check_gemini_protocol((Url)data))
     {
         // no response body, meta for additional info
         response->status = BAD_REQUEST;
         strcpy(response->meta, "Bad protocol, should be `gemini`");
         return 0;
     }
-
+    */
     Path path = parse_request_url((Url)data);
     response->resource.path = path;
 
@@ -205,7 +206,7 @@ int construct_response(const char *data, const Path root_dir, struct Response *r
     return 0;
 }
 
-int send_response(const struct Response response, int socket_fd)
+int send_response(SSL *ssl, const struct Response response, int socket_fd)
 {
     // for the send_all func
     int *len = (int *)malloc(sizeof(int));
@@ -222,7 +223,7 @@ int send_response(const struct Response response, int socket_fd)
             return -1;
         }
         *len = strlen(header);
-        if ((send_all(socket_fd, header, len)) == -1)
+        if ((SSL_write(ssl, header, *len)) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
             return -1;
@@ -232,7 +233,7 @@ int send_response(const struct Response response, int socket_fd)
 
         // TODO send response body
         *len = strlen(response.resource.content);
-        if ((send_all(socket_fd, response.resource.content, len)) == -1)
+        if ((SSL_write(ssl, response.resource.content, *len)) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
             return -1;
@@ -253,7 +254,7 @@ int send_response(const struct Response response, int socket_fd)
                 return -1;
             }
             *len = strlen(header);
-            if ((send_all(socket_fd, header, len)) == -1)
+            if ((SSL_write(ssl, header, *len)) == -1)
             {
                 perror("An error occurred when trying to write stuff to connection");
                 return -1;
@@ -269,7 +270,7 @@ int send_response(const struct Response response, int socket_fd)
                 return -1;
             }
             *len = strlen(header);
-            if ((send_all(socket_fd, header, len)) == -1)
+            if ((SSL_write(ssl, header, *len)) == -1)
             {
                 perror("An error occurred when trying to write stuff to connection");
                 return -1;
