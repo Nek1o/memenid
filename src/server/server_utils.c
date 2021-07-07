@@ -58,7 +58,6 @@ bool check_gemini_protocol(const Url url)
     size_t semicolon_index = find(url, ':');
     if (semicolon_index == -1)
         return false;
-
     return strncmp(url, "gemini", semicolon_index - 1) == 0 ? true : false;
 }
 
@@ -66,9 +65,26 @@ bool check_gemini_protocol(const Url url)
 // e.g. gemini://xxx.xx/yy/zz => /yy/zz
 // returns "/" if no path was presented
 // !!! need cleanup !!!
+
+bool find_two_leading_symbols(char *str, char symbol)
+{
+    for (size_t i = 0; i < strlen(str); i++)
+        if (str[i + 1] != '\0')
+            if (str[i] == symbol && str[i + 1] == symbol)
+                return true;
+    return false;
+}
+
 Path parse_request_url(const Url url)
 {
     int third_slash_index = find_n(url, '/', 3);
+
+    if (find_two_leading_symbols(url, '.'))
+    {
+        char *path = (char *)malloc(2);
+        strcpy(path, "/");
+        return path;
+    }
 
     if (third_slash_index == -1)
     {
