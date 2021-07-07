@@ -35,11 +35,6 @@ int main(int argc, char **argv)
 {
     // signal(SIGINT, sigint_handler);
 
-    // TODO
-    // https://wiki.openssl.org/index.php/Simple_TLS_Server
-
-    // parse_request_url("gemini://xxx.xx/yy/zz");
-
     struct Arguments args = get_server_args(argc, argv);
 
     SSL_CTX *ctx;
