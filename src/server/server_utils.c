@@ -180,14 +180,14 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
 
 int construct_response(const char *data, const Path root_dir, struct Response *response)
 {
-    /*if (!check_gemini_protocol((Url)data))
+    if (!check_gemini_protocol((Url)data))
     {
         // no response body, meta for additional info
         response->status = BAD_REQUEST;
         strcpy(response->meta, "Bad protocol, should be `gemini`");
         return 0;
     }
-    */
+
     Path path = parse_request_url((Url)data);
     response->resource.path = path;
 
@@ -206,78 +206,39 @@ int construct_response(const char *data, const Path root_dir, struct Response *r
     return 0;
 }
 
+static int send_head(SSL *ssl, struct Response response)
+{
+    char header[2048];
+    if (sprintf(header, "%d %s\r\n", response.status, response.meta) < 0)
+    {
+        // failed to construct a header string
+        // don't know yet what to do in this case
+        return -1;
+    }
+    if ((SSL_write(ssl, header, strlen(header))) == -1)
+    {
+        perror("An error occurred when trying to write stuff to connection");
+        return -1;
+    }
+
+    return 0;
+}
+
 int send_response(SSL *ssl, const struct Response response, int socket_fd)
 {
-    // for the send_all func
-    int *len = (int *)malloc(sizeof(int));
-
-    char header[2048];
     // send success response header
     // <STATUS><SPACE><META><CR><LF>
+    send_head(ssl, response);
+
+    // send body upon success
     if (response.status == SUCCESS)
     {
-        if (sprintf(header, "%d %s\r\n", SUCCESS, response.meta) < 0)
-        {
-            // failed to construct a header string
-            // don't know yet what to do in this case
-            return -1;
-        }
-        *len = strlen(header);
-        if ((SSL_write(ssl, header, *len)) == -1)
+        if ((SSL_write(ssl, response.resource.content, strlen(response.resource.content))) == -1)
         {
             perror("An error occurred when trying to write stuff to connection");
             return -1;
         }
-
-        // TODO validate send_all len
-
-        // TODO send response body
-        *len = strlen(response.resource.content);
-        if ((SSL_write(ssl, response.resource.content, *len)) == -1)
-        {
-            perror("An error occurred when trying to write stuff to connection");
-            return -1;
-        }
-        // TODO validate send_all len
-
-        return 0;
-    }
-    if (response.status / 10 == 5)
-    {
-        // TODO make send_header func
-        if (response.status == BAD_REQUEST)
-        {
-            if (sprintf(header, "%d %s\r\n", BAD_REQUEST, response.meta) < 0)
-            {
-                // failed to construct a header string
-                // don't know yet what to do in this case
-                return -1;
-            }
-            *len = strlen(header);
-            if ((SSL_write(ssl, header, *len)) == -1)
-            {
-                perror("An error occurred when trying to write stuff to connection");
-                return -1;
-            }
-        }
-
-        if (response.status == NOT_FOUND)
-        {
-            if (sprintf(header, "%d %s\r\n", NOT_FOUND, response.meta) < 0)
-            {
-                // failed to construct a header string
-                // don't know yet what to do in this case
-                return -1;
-            }
-            *len = strlen(header);
-            if ((SSL_write(ssl, header, *len)) == -1)
-            {
-                perror("An error occurred when trying to write stuff to connection");
-                return -1;
-            }
-        }
     }
 
-    free(len);
     return 0;
 }
