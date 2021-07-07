@@ -84,14 +84,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        FILE *file = NULL;
-        if ((file = fopen("logs", "a")) == NULL)
-        {
-            perror("An error occurred during openning a file for serving");
-            return 1;
-        }
-
-        fprintf(file, "Successfully received a request %s", conn_buff);
+        printf("Successfully received a request %s\n", conn_buff);
 
         struct Response response;
         Response_new(&response);
