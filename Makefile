@@ -21,4 +21,4 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 
 .PHONY: clean
 clean:
-	rm -r $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
