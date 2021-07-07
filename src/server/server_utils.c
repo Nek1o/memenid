@@ -163,14 +163,14 @@ int get_resource_for_serving(const Path root_dir, struct Resource *resource)
 
 int construct_response(const char *data, const Path root_dir, struct Response *response)
 {
-    if (!check_gemini_protocol((Url)data))
+    /*if (!check_gemini_protocol((Url)data))
     {
         // no response body, meta for additional info
         response->status = BAD_REQUEST;
         strcpy(response->meta, "Bad protocol, should be `gemini`");
         return 0;
     }
-
+    */
     Path path = parse_request_url((Url)data);
     response->resource.path = path;
 
