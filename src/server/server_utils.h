@@ -47,6 +47,9 @@ void Response_free(struct Response *);
 // !!! need cleanup !!!
 Path parse_request_url(const Url);
 
+// returns true or false based on find result;
+bool find_two_leading_symbols(char *str, char symbol);
+
 // check_protocol returns false if protocol isn't gemini
 bool check_gemini_protocol(const Url);
 
