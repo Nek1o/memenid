@@ -68,10 +68,9 @@ bool check_gemini_protocol(const Url url)
 
 bool find_two_leading_symbols(char *str, char symbol)
 {
-    for (size_t i = 0; i < strlen(str); i++)
-        if (str[i + 1] != '\0')
-            if (str[i] == symbol && str[i + 1] == symbol)
-                return true;
+    for (size_t i = 0; i < strlen(str) - 1; i++)
+        if (str[i] == symbol && str[i + 1] == symbol)
+            return true;
     return false;
 }
 
