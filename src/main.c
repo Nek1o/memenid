@@ -77,7 +77,7 @@ int main(int argc, char **argv)
             close(conn_fd);
             continue;
         }
-        if ((recv(conn_fd, conn_buff, MAX_URL_SIZE, 0)) == -1)
+        if ((SSL_read(ssl, conn_buff, MAX_URL_SIZE)) == -1)
         {
             perror("An error occurred during reading from socket");
             close(conn_fd);
