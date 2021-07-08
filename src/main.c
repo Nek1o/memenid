@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <stdbool.h>
 
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -57,6 +58,14 @@ int main(int argc, char **argv)
             perror("An error occurred during openning a new connection");
             continue;
         }
+
+        // setting the timeout to the connection socket
+        struct timeval timeout;
+        timeout.tv_sec = 10;
+        timeout.tv_usec = 0;
+        if (setsockopt(conn_fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,
+                       sizeof(timeout)) < 0)
+            perror("timeout connection socket setsockopt failed\n");
 
         SSL *ssl;
         ssl = SSL_new(ctx);
