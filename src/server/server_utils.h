@@ -29,6 +29,13 @@ struct Response
     MetaString meta;
 };
 
+// -1 on not found
+int find(const char *str, char symbol);
+
+// like find, but finds the index of the nth occurrence,
+// returns -1 on not finding exactly nth occurrence
+int find_n(const char *str, char symbol, int n);
+
 // Resource_new initializes Resource struct with the null value
 void Resource_new(struct Resource *);
 

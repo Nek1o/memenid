@@ -4,12 +4,13 @@
 #include <errno.h>
 
 #include "server_utils.h"
+#include "mime.h"
 #include "../network/socket.h"
 #include "../network/open_ssl.h"
 #include "../gemini_protocol/gemini_utils.h"
 
 // -1 on not found
-static int find(const char *str, char symbol)
+int find(const char *str, char symbol)
 {
     for (size_t i = 0; i < strlen(str); i++)
         if (str[i] == symbol)
@@ -20,7 +21,7 @@ static int find(const char *str, char symbol)
 
 // like find, but finds the index of the nth occurrence,
 // returns -1 on not finding exactly nth occurrence
-static int find_n(const char *str, char symbol, int n)
+int find_n(const char *str, char symbol, int n)
 {
     int counter = 0;
     for (size_t i = 0; i < strlen(str); i++)
@@ -214,9 +215,7 @@ int construct_response(const char *data, const Path root_dir, struct Response *r
     }
 
     response->status = SUCCESS;
-    // TODO deduce file MIME type from the file extension
-    strcpy(response->meta, "text/gemini; lang=en\r\n");
-
+    deduce_mime_type(response->resource.path, response->meta);
     return 0;
 }
 
