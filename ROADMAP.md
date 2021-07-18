@@ -8,7 +8,7 @@
   - [X] File serving
 
 ## Release 1.0
-  - [ ] MIME-types deducing
+  - [X] MIME-types deducing
   - [ ] Configuration from the config file
   - [ ] Proper logging
   - [ ] Multi-threading
